@@ -20,6 +20,8 @@ struct SignatureData {
 contract WebAuthnSignatureValidatorSingleton is SignatureValidator {
     IWebAuthnVerifier public immutable WEBAUTHN_SIG_VERIFIER;
     address private immutable SIGNATURE_VALIDATOR_SINGLETON;
+    bytes32 private immutable SLOT_X;
+    bytes32 private immutable SLOT_Y;
 
     /**
      * @dev Constructor function.
@@ -28,6 +30,8 @@ contract WebAuthnSignatureValidatorSingleton is SignatureValidator {
     constructor(address webAuthnVerifier) {
         WEBAUTHN_SIG_VERIFIER = IWebAuthnVerifier(webAuthnVerifier);
         SIGNATURE_VALIDATOR_SINGLETON = address(this);
+        SLOT_X = bytes32(uint256(uint160(SIGNATURE_VALIDATOR_SINGLETON)));
+        SLOT_Y = bytes32(uint256(SLOT_X)+1);
     }
 
     /**
@@ -43,7 +47,7 @@ contract WebAuthnSignatureValidatorSingleton is SignatureValidator {
         }
 
         (X, Y) = abi.decode(
-            ISafe(msg.sender).getStorageAt(uint256(uint160(SIGNATURE_VALIDATOR_SINGLETON)), 2),
+            ISafe(msg.sender).getStorageAt(uint256(SLOT_X), 2),
             (uint256, uint256)
         );
 
@@ -65,8 +69,8 @@ contract WebAuthnSignatureValidatorSingleton is SignatureValidator {
     function setSigner(uint256 X, uint256 Y) public {
         require(address(this) != SIGNATURE_VALIDATOR_SINGLETON, "setSigner should only be called via delegatecall");
 
-        bytes32 slotX = bytes32(uint256(uint160(SIGNATURE_VALIDATOR_SINGLETON)));
-        bytes32 slotY = bytes32(uint256(slotX)+1);
+        bytes32 slotX = SLOT_X;
+        bytes32 slotY = SLOT_Y;
         /* solhint-disable no-inline-assembly */
         /// @solidity memory-safe-assembly
         assembly {
@@ -82,8 +86,8 @@ contract WebAuthnSignatureValidatorSingleton is SignatureValidator {
         require(address(this) != SIGNATURE_VALIDATOR_SINGLETON, "removeSigner should only be called via delegatecall");
         require(!ISafe(address(this)).isOwner(SIGNATURE_VALIDATOR_SINGLETON), "can't clear the signer storage before removing the validator singleton from the owners list");
 
-        bytes32 slotX = bytes32(uint256(uint160(SIGNATURE_VALIDATOR_SINGLETON)));
-        bytes32 slotY = bytes32(uint256(slotX)+1);
+        bytes32 slotX = SLOT_X;
+        bytes32 slotY = SLOT_Y;
         /* solhint-disable no-inline-assembly */
         /// @solidity memory-safe-assembly
         assembly {
