@@ -18,11 +18,13 @@ contract DeterministicDeployScript is Script {
         bool success;
 
         if(!isContract(EXPECTED_ADDRESS)){ //check if already deployed
-            bytes memory managerCreationCode = abi.encodePacked(
-            type(WebAuthnSignatureValidatorSingleton).creationCode, abi.encode(0xCAc51aDF726E4b269645a7fD6a43296A1Ff53e8d));
+            bytes memory webAuthnSignatureValidatorSingletonCreationCode = abi.encodePacked(
+                type(WebAuthnSignatureValidatorSingleton).creationCode, 
+                abi.encode(0xCAc51aDF726E4b269645a7fD6a43296A1Ff53e8d)
+            );
 
             (success, returnData) = DETERMINISTIC_CREATE2_FACTORY.call(
-                managerCreationCode);
+                webAuthnSignatureValidatorSingletonCreationCode);
             webAuthnSigner = WebAuthnSignatureValidatorSingleton(address(uint160(bytes20(returnData))));
 
             assert(address(webAuthnSigner) == EXPECTED_ADDRESS);
