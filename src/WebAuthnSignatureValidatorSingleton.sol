@@ -79,6 +79,13 @@ contract WebAuthnSignatureValidatorSingleton is SignatureValidator {
         }
     }
 
+    function getSigner() public view returns (uint256 X, uint256 Y){
+        (X, Y) = abi.decode(
+            ISafe(msg.sender).getStorageAt(uint256(SLOT_X), 2),
+            (uint256, uint256)
+        );
+    }
+
     /*
      *@dev to be delegate called from the Safe account
      */
