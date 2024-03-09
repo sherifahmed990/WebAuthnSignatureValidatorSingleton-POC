@@ -2,7 +2,6 @@
 /* solhint-disable one-contract-per-file */
 /* https://github.com/safe-global/safe-smart-account/blob/12136fd54940892bf43258f86b6e8f9d0eff69ea/contracts/proxies/WebAuthnSignatureValidatorProxy.sol 
 This is a renamed version of the SafeProxy contract for the WebAuthn Singature Validator to avoid confusing between a SafeProxy with a WebAuthnSignatureValidatorProxy
-It can be used with the SafeProxyFactory
 */
 pragma solidity >=0.7.0 <0.9.0;
 
